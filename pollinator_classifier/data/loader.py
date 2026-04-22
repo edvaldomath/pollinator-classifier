@@ -13,6 +13,12 @@ from pollinator_classifier.config import SIGNAL_COLUMNS, SPECIES_LABELS
 
 logger = logging.getLogger(__name__)
 
+# Maps known filename typos/variants → canonical species label.
+# Add entries here when the dataset uses a non-standard spelling.
+FILENAME_ALIASES: dict[str, str] = {
+    "bombus_lapidaries": "bombus_lapidarius",
+}
+
 
 @dataclass
 class SignalRecord:
@@ -28,12 +34,25 @@ class SignalRecord:
 
 
 def _parse_filename(path: Path) -> Optional[dict]:
-    """Parse metadata from a filename: {genus}_{species}_{subject_id}_{medicao}.csv."""
+    """Parse metadata from a filename: {genus}_{species}_{subject_id}_{medicao}.csv.
+
+    Applies FILENAME_ALIASES so that known typos in the dataset are silently
+    mapped to the canonical species label without renaming files on disk.
+    """
     stem = path.stem
+
+    # Resolve alias before matching against SPECIES_LABELS
+    canonical_stem = stem
+    for alias, canonical in FILENAME_ALIASES.items():
+        if stem.startswith(alias + "_"):
+            canonical_stem = canonical + stem[len(alias):]
+            logger.debug("Filename alias applied: '%s' -> '%s'", alias, canonical)
+            break
+
     for label in SPECIES_LABELS:
         prefix = label + "_"
-        if stem.startswith(prefix):
-            remainder = stem[len(prefix):]
+        if canonical_stem.startswith(prefix):
+            remainder = canonical_stem[len(prefix):]
             match = re.fullmatch(r"(\d+)_(\d+)", remainder)
             if match:
                 genus, species_name = label.split("_", 1)

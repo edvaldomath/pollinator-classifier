@@ -1,0 +1,7 @@
+# Dependências completas para treinar os modelos localmente
+# Requer Python 3.10–3.12 (TensorFlow não suporta 3.13+)
+# Uso: pip install -r requirements_training.txt
+
+-r requirements.txt
+
+tensorflow>=2.16.0,<3.0.0

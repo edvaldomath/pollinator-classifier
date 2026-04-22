@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Streamlit Dashboard",
+      "runtimeExecutable": "streamlit",
+      "runtimeArgs": ["run", "dashboard.py", "--server.port", "8501", "--server.headless", "true"],
+      "port": 8501
+    },
+    {
+      "name": "Jupyter Notebook",
+      "runtimeExecutable": "jupyter",
+      "runtimeArgs": ["notebook", "--port", "8888", "--no-browser", "--NotebookApp.token=''"],
+      "port": 8888
+    }
+  ]
+}
